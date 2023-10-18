@@ -10,8 +10,9 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 public class FeignController {
 
-    public FeignController() {
-
+    private final FeignService feignService;
+    public FeignController(FeignService feignService) {
+        this.feignService = feignService;
     }
 
     @GetMapping("/feign")
@@ -20,7 +21,14 @@ public class FeignController {
 
         List<CompletableFuture<TodoResponse>> futures = new ArrayList<>();
 
+        for(int i = 0; i < 10; i++) {
+            CompletableFuture<TodoResponse> future = CompletableFuture.supplyAsync(() -> feignService.fetchData());
+            futures.add(future);
+        }
 
+        CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+
+        allOf.get();
         long endTime = System.currentTimeMillis();
 
         return "Total execution time: " + (endTime - startTime) + " ms";
