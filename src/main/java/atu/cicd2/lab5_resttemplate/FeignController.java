@@ -16,21 +16,26 @@ public class FeignController {
     }
 
     @GetMapping("/feign")
-    public String getFeignData() throws Exception, InterruptedException {
-        long startTime = System.currentTimeMillis();
+    public TodoResponse getFeignData() throws Exception{
 
         List<CompletableFuture<TodoResponse>> futures = new ArrayList<>();
 
-        for(int i = 0; i < 10; i++) {
-            CompletableFuture<TodoResponse> future = CompletableFuture.supplyAsync(() -> feignService.fetchData());
+        for (int i = 0; i < 200; i++) {
+            int finalI = i;
+            CompletableFuture<TodoResponse> future = CompletableFuture.supplyAsync(() -> feignService.fetchData(finalI + 1));
             futures.add(future);
         }
 
         CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
 
         allOf.get();
-        long endTime = System.currentTimeMillis();
+        ArrayList<TodoResponse> listOfTodos = feignService.getTodoData();
 
-        return "Total execution time: " + (endTime - startTime) + " ms";
+        for (int i = 0; i < listOfTodos.size(); i++) {
+            if (listOfTodos.get(i).getId() == 196) {
+                return listOfTodos.get(i);
+            }
+        }
+        return listOfTodos.get(0);
     }
 }
