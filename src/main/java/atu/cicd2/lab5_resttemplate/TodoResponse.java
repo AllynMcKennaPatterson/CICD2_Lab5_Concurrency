@@ -16,4 +16,8 @@ public class TodoResponse {
 
     @JsonProperty("completed")
     private boolean completed;
+
+    public int getId() {
+        return id;
+    }
 }
