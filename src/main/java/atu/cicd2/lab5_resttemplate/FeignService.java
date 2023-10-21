@@ -2,23 +2,25 @@ package atu.cicd2.lab5_resttemplate;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 public class FeignService {
 
     private final TodoClient todoClient;
+    ArrayList<TodoResponse> todoData = new ArrayList<>();
 
     public FeignService(TodoClient todoClient){
         this.todoClient = todoClient;
     }
 
-    public TodoResponse fetchData() {
-        TodoResponse td = todoClient.fetchData();
-        System.out.println(td);
-        try{
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public ArrayList<TodoResponse> getTodoData() {
+        return todoData;
+    }
+
+    public TodoResponse fetchData(int i) {
+        TodoResponse td = todoClient.fetchData(i);
+        todoData.add(td);
         return td;
     }
 }
